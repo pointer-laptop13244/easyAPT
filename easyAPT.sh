@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-dialog --title "Welcome to easyAPT!" --infobox "This is version JUN2-2026-RV5. Starting up..." 0 0
+dialog --title "Welcome to easyAPT!" --infobox "This is version JUN2-2026-R6 (June 2, 2026 Revision 6). We are now starting up, this takes only a few seconds." 0 0
 sleep 1
 touch test.txt test2.txt test3.txt test4.txt
 apt >/dev/null 2>&1
