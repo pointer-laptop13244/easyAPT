@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-dialog --title "Startup" --infobox "Welcome to easyAPT. Starting up..." 0 0
+dialog --title "Welcome to easyAPT!" --infobox "This is version JUN2-2026-RV5. Starting up..." 0 0
 sleep 1
 touch test.txt test2.txt test3.txt test4.txt
 apt >/dev/null 2>&1
@@ -61,7 +61,7 @@ case "$TEST4" in
 	127)
 		clear
 		dialog --title "Startup Failure" --msgbox "Looks like you're missing the cat package. Try reinstalling the coreutils package." 0 0
-		exit 0
+		exit 10
 		;;
 	*)
 		;;
@@ -71,9 +71,9 @@ if [ "$EUID" -ne 0 ]; then
 	exit 5
 fi
 sleep 2
-CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option below." 0 0 0 \
+CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option below. Use the UP and DOWN arrow keys to navigate the menu and use the space/enter key to select the option. " 0 0 0 \
 	"1" "Remove unrequired packages" \
-	"2" "Fix broken packages" \
+	"2" "Fix incomplete install" \
 	"3" "Install a package" \
 	"4" "Search for a package" \
 	"5" "List all installed packages" \
@@ -84,7 +84,46 @@ CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option
 	"10" "Upgrade Packages + Repository" \
 	"11" "Do an internet test" \
 	"12" "Custom Command" \
-	"13" "Quit to terminal/desktop")
+	"13" "See last command output" \
+	"14" "Quit to terminal/desktop")
 
 exitstatus=$?
 
+case "$CHOICE" in
+	1)
+		dialog --title "Operation" --infobox "Please wait while we remove all unrequired packages." 0 0
+		sleep 1
+		touch OUTPUT.txt
+		apt autoremove -y > OUTPUT.txt
+		OPERATION_STATUS=$?
+		sleep 1
+		case "$OPERATION_STATUS" in
+			"0")
+				dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+			*)
+				dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	2)
+		dialog --title "Operation" --infobox "Please wait while we fix all broken packages." 0 0
+		sleep 1
+		touch OUTPUT.txt
+		dpkg --configure -a > OUTPUT.txt
+		OPERATION_STATUS=$?
+		sleep 1
+		case "$OPERATION_STATUS" in
+			"0")
+				dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+			*)
+				dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+esac
