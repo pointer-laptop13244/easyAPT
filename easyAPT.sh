@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 echo "" > OUTPUT.txt
-dialog --title "Welcome to easyAPT!" --infobox "This is version JUN4-2026-R3 (June 4, 2026 Revision 3). We are now starting up, this takes only a few seconds." 0 0
+dialog --title "Welcome to easyAPT!" --infobox "This is version JUN5-2026-R7 (June 5, 2026 Revision 7). We are now starting up, this takes only a few seconds." 0 0
 sleep 1
 touch test.txt test2.txt test3.txt test4.txt output.txt
 apt >/dev/null 2>&1
@@ -446,6 +446,176 @@ case "$CHOICE" in
 								;;
 						esac
 						;;
+	7)
+CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package you'd like to remove. This removes the configuration files that it used for reinstallation later. If you don't want to remove those files, click cancel, and then click 'Remove a package'.." 0 0 "Replace with package to remove")
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				;;
+		esac
+		touch OUTPUT.txt
+		apt-get purge $CHOICE99 -y >> OUTPUT.txt
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+	8)
+		CHOICE29=$(dialog --title "Package" --nocancel --stdout --inputbox "Type the package to mark as something" 0 0 "" )
+		sleep 2
+		CHOICE35=$(dialog --title "Mark the selected package as..." --nocancel --stdout --menu "Choose what to mark the package as..." 0 0 0 \
+		       "hold" "Hold it" \
+	       	       "unhold" "Unhold it" \
+		       "auto" "Auto" \
+		       "manual" "Manual" \
+		       "Back" "Back to main menu")
+ 		case "$CHOICE35" in
+			"Back")
+				./easyAPTmenu.sh
+				;;
+			*)
+				touch OUTPUT.txt
+				apt-mark $CHOICE35 $CHOICE29 >> OUTPUT.txt
+				case $? in
+					0)
+						dialog --title "Results" --msgbox --stdout "Operations were successful with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+					*)
+						dialog --title "Results" --msgbox --stdout "Operations failed with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+				esac
+		esac
+		;;
+	9)
+		dialog --title "Operation" --infobox "Updating the repository, please wait..." 0 0
+		touch OUTPUT.txt
+		apt-get update -y >> OUTPUT.txt
+		case $? in
+					0)
+						dialog --title "Results" --msgbox --stdout "Operations were successful with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+					*)
+						dialog --title "Results" --msgbox --stdout "Operations failed with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+				esac
+				;;
+	10)
+		dialog --title "Operation 1/3" --infobox "Updating the packages, please wait..." 0 0
+		touch OUTPUT.txt
+		echo "-------> Step One" >> OUTPUT.txt
+		apt-get update -y >> OUTPUT.txt
+		case $? in
+			0)
+				dialog --title "Operation 2/3" --infobox "Success code $?, continuing." 0 0
+				;;
+			*)
+				dialog --title "Operation 1/3" --msgbox --stdout "Operation terminated because of error $?. Click enter to go back." 0 0
+				./easyAPT.sh
+				exit 0
+				;;
+		esac
+		echo "------> Step Two" >> OUTPUT.txt
+		apt-get upgrade -y >> OUTPUT.txt
+		case $? in
+			0)
+				dialog --title "Operation 3/3" --infobox "Success code $?, continuing." 0 0
+				;;
+			*)
+				dialog --title "Operation 2/3" --msgbox --stdout "Operation terminated because of error $?. Click enter to go back." 0 0
+				./easyAPTmenu.sh
+				exit 0
+				;;
+		esac
+		echo "------> Step Three" >> OUTPUT.txt
+		apt-get dist-upgrade -y >> OUTPUT.txt
+		case $? in 
+			0)
+				dialog --title "Operation Finished - 3/3" --msgbox --stdout "Operation finished with code $?, click enter/space to go back." 0 0
+				./easyAPTmenu.sh
+				;;
+			*)
+				dialog --title "Operation Failed - 3/3" --msgbox --stdout "Operation 3 failed with error $?, click enter/space to go back." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	11)
+		dialog --title "Operation" --infobox "Finishing Internet Test, please wait..." 0 0
+		touch OUTPUT.txt
+		ping -W 10 -c 10 8.8.8.8 >> OUTPUT.txt
+		case "$?" in
+			0)
+				dialog --title "Operation Results" --msgbox --stdout "Internet connection test was a success! You can use all features of this tool." 0 0
+				./easyAPTmenu.sh 
+				;;
+			*)
+				dialog --title "Operation Results" --msgbox --stdout "Internet connection test wasn't a success. First, try going back to the menu and making sure 'iputils-ping' is installed. If it is, check your internet connection." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	12)
+		CHOICES=$(dialog --title "Custom Command" --nocancel --stdout --menu "Choose an option below of what frontend you want to submit your command to." 0 0 0 \
+			"apt" "Standard apt utility (not recommended)" \
+			"apt-get" "Apt utility meant for scripts (recommended)" \
+			"apt-cache" "Searching and getting info about packages" \
+			"apt-mark" "Package Marker" \
+			"dpkg" "APT package managing engine (only recommended for those who know what they are doing)" \
+			"ping" "Internet connection tester" \
+			"bash" "Standard terminal shell" \
+			"sh" "Standard terminal shell" \
+			"" "Other terminal shell" \
+			"b" "Go back to the main menu")
+		case "$CHOICES" in
+			"b")
+				./easyAPTmenu.sh
+				;;
+			*)
+				COMMAND=$(dialog --title "Command" --inputbox --stdout "Type your command below, flags and all." 0 0 "type your command here --including -all --the-very -fun --flags") 
+				clear
+				echo "The menu has been hidden so you can see all output of the command."
+				echo ""
+				echo "Once it has been exited, you will have access to the menu."
+				echo "Starting in 3 seconds"
+				sleep 3
+				echo "---"
+				$CHOICES $COMMAND
+				sleep 2
+				echo "---"
+				echo "Done, shell exit code $?"
+				read -p "Hit enter to go back to the menu, push CTRL+C to exit to the command prompt"
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	13)
+		dialog --title "Last command output" --textbox OUTPUT.txt 0 0
+		./easyAPTmenu.sh
+		;;
+	14)
+		dialog --title "Updating" --infobox --stdout "Updating the tool. Make sure that git is installed and running properly." 0 0
+		touch OUTPUT.txt
+		echo "-----> GIT existence check"
+		git >> OUTPUT.txt
+		case "$?" in
+			1)
+				;;
+			127)
+				dialog --title "GIT error" --msgbox --stdout "GIT wasn't found. Try going to the Main Menu > Install a package > Install with specific name and then type GIT and hit enter." 0 0
+
+
 
 
 esac
