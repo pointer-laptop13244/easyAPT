@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 echo "" > OUTPUT.txt
-dialog --title "Welcome to easyAPT!" --infobox "This is version JUN3-2026-R6 (June 3, 2026 Revision 6). We are now starting up, this takes only a few seconds." 0 0
+dialog --title "Welcome to easyAPT!" --infobox "This is version JUN4-2026-R3 (June 4, 2026 Revision 3). We are now starting up, this takes only a few seconds." 0 0
 sleep 1
 touch test.txt test2.txt test3.txt test4.txt output.txt
 apt >/dev/null 2>&1
@@ -372,6 +372,80 @@ case "$CHOICE" in
 				dialog --title "Package list" --textbox OUTPUT.txt 0 0
 				./easyAPTmenu.sh
 				;;
-esac
+	5)
+		CHOICE22=$(dialog --title "What to list" --nocancel --stdout --menu "Choose the packages to list." 0 0 0 \
+			"1" "Only Installed Packages" \
+			"2" "Only Not Installed Packages" \
+			"3" "All packages that system knows about" \
+			"4" "Custom flags" \
+			"5" "Go back to main menu")
+		case "$CHOICE22" in
+			4)
+				;;
+		
+			*)
+				CHOICE6=$(dialog --title "Filter by" --nocancel --inputbox --stdout "What is the package you'd like to filter the list by? (If you don't want to, enter nothing and continue.)" 0 0)
+				;;
+		esac
+		#divider
+		case "$CHOICE22" in
+			1)
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $CHOICE6 --installed >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			2)
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $CHOICE6 '!~i' >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			3)
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $CHOICE6 >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			4)
+				FLAGS=$(dialog --title "Choose your flags" --nocancel --inputbox --stdout "Choose your custom flags at the end of the command." 0 0  "<filter> -fun --flags")
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $FLAGS >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			5)
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
 
-				
+	6)
+		CHOICE99=$(dialog --title "Package Removal" --inputbox --stdout "Type the package you'd like to remove. This keeps the configuration files that it used for reinstallation later. If you don't want to keep those files, click cancel, and then click 'Remove a package + all config files'.." 0 0 "Replace with package to remove")
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				;;
+		esac
+		touch OUTPUT.txt
+		apt-get remove $CHOICE99 -y >> OUTPUT.txt
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+
+
+esac
