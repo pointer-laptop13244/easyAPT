@@ -592,9 +592,10 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 				sleep 3
 				echo "---"
 				$CHOICES $COMMAND
+				exitSTAT=$?
 				sleep 2
 				echo "---"
-				echo "Done, shell exit code $?"
+				echo "Done, shell exit code $exitSTAT"
 				read -p "Hit enter to go back to the menu, push CTRL+C to exit to the command prompt"
 				./easyAPTmenu.sh
 				;;
@@ -614,8 +615,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 				;;
 			127)
 				dialog --title "GIT error" --msgbox --stdout "GIT wasn't found. Try going to the Main Menu > Install a package > Install with specific name and then type GIT and hit enter." 0 0
-
-
-
-
+				;;
+		esac
+		;;
 esac
