@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 echo "" > OUTPUT.txt
-dialog --title "Welcome to easyAPT!" --infobox "This is version JUN5-R7 (June 5 Revision 7), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
+dialog --title "Welcome to easyAPT!" --infobox "This is version JUN8-R4 (June 8 Revision 4), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
 sleep 1
 touch test.txt test2.txt test3.txt test4.txt output.txt
 apt >/dev/null 2>&1
@@ -611,10 +611,96 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		echo "-----> GIT existence check"
 		git >> OUTPUT.txt
 		case "$?" in
-			1)
-				;;
 			127)
 				dialog --title "GIT error" --msgbox --stdout "GIT wasn't found. Try going to the Main Menu > Install a package > Install with specific name and then type GIT and hit enter." 0 0
+				./easyAPTmenu.sh
+				exit 0
+				;;
+			*)
+				;;
+		esac
+		sleep 2
+		dialog --title "" --msgbox --stdout "On the next screen, you'll see a directory picker. Select the directory where the easyAPT repo was cloned. If you moved it to a new location, then select that location instead. Make sure to SELECT THE EASYAPT FOLDER, not its parent directory. For example, if easyAPT was in your home directory, you'd choose '~/easyAPT', not '~'." 0 0
+		SCRIPTPATH=$(dialog --title "Select the directory below." --dselect --stdout $HOME 0 0)
+		dialog --title "Updating" --infobox --stdout "Updating the tool. Give us a moment..." 0 0 
+		cd SCRIPTPATH
+		sleep 2
+		rm .version2
+		sleep 1
+		echo "-----> curl (get the current version number in the repo) command output" >> OUTPUT.txt
+		curl -L -o .version2 "https://raw.githubusercontent.com/pointer-laptop13244/easyAPT/refs/heads/main/.version2" >> OUTPUT.txt
+		case $? in
+			0)
+				sleep 1
+				CURRENTVER=$(cat .version)
+				UPDATEVER=$(cat .version2)
+				if (( CURRENTVER == UPDATEVER )); then
+					dialog --title "No updates avalible" --msgbox --stdout "Seems like the version you have matches the one in the repo. You're up to date!" 0 0
+					./easyAPTmenu.sh
+					exit 0
+				else
+					dialog --title "Update Message" --yesno --stdout "Your install doesn't match the one in the repo. If you're not on the stable version of easyAPT, check that the Github release number on the splash screen matches your version, and if not, reclone the repo. If you are NOT, however, you can automatically update to the latest stable version. Would you like to update now?" 0 0
+					case $? in
+						0)
+							;;
+						*)
+							./easyAPTmenu.sh
+							exit 0
+							;;
+					esac
+					dialog --title "" --infobox --stdout "Updating the tool. Give us a moment..." 0 0
+					sleep 2
+					cd $SCRIPTPATH
+					case $? in
+						0)
+							;;
+						*)
+							dialog --title "Error (code $?)" --msgbox --stdout "We ran into a issue changing to the easyAPT directory you specified. Check that it exists and that you have the right permissions. This check is in effect to prevent us from deleting the wrong thing."
+							./easyAPTmenu.sh
+							exit 0
+							;;
+					esac
+					rm * >/dev/null 2>&1
+					sleep 2 
+					cd ..
+					sleep 2
+					dialog --title "" --infobox --stdout "Updating the tool, give us a moment. Don't terminate or interrupt this script: things might break!" 0 0
+					echo "------> Repo Cloning" >> OUTPUT.txt
+					gh repo clone pointer-laptop13244/easyAPT >> OUTPUT.txt
+					exitStatus=$?
+					sleep 2
+					case "$exitStatus" in
+						0)
+							;;
+						*)
+							dialog --title "Fatal Error (code $?)" --msgbox --stdout "We ran into an issue updating the tool, and now your install may be broken. The simplest way to fix this is to delete all leftover files and reclone the repo manually back to your device - check the Github README.md page for more info. The script will now terminate" 0 0
+							clear
+							exit 8
+							;;
+					esac
+					dialog --title "Update" --msgbox --stdout "The update seems like it was a success, but you need to restart the script to apply it. When ready, click OK, navigate to your easyAPT directory, and type ./easyAPT.sh to launch the script." 0 0
+					clear
+					exit 0	
+				fi
+				;;
+			*)
+				dialog --title "Operation Failure" --msgbox --stdout "Something went wrong while we tried to check for updates. Go to the Main Menu > See last command output to see what went wrong." 0 0
+				./easyAPTmenu.sh
+				exit 0
+				;;
+		
+		esac
+		;;
+	15)
+		dialog --title "Exit" --yesno --stdout "Are you sure you want to leave easyAPT? You can relaunch it anytime by typing ./easyAPT.sh." 0 0
+		case $? in
+			0)
+				clear
+				exit 0
+				;;
+			*)
+				./easyAPTmenu.sh
+				exit 0
 				;;
 		esac
 		;;
