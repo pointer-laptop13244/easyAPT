@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 echo "" > OUTPUT.txt
-dialog --title "Welcome to easyAPT!" --infobox "This is version JUN8-R4 (June 8 Revision 4), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
+dialog --title "Welcome to easyAPT!" --infobox "This is version JUN30-V32 (June 30 Version 32), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
 sleep 1
 #touch test.txt test2.txt test3.txt test4.txt output.txt
 apt >/dev/null 2>&1
