@@ -1,10 +1,14 @@
 #!/bin/bash
 clear
 echo "" > OUTPUT.txt
+<<<<<<< HEAD
 #PERCENT=0
 #dialog --title "Welcome to easyAPT!" --stdout --gauge "This is version JUL8-V32 (July 8 Version 36), Github release N/A.  We are now starting up, this takes only a few seconds." 9 0 $PERCENT
 touch .percent.txt
 echo "00" > .percent.txt &&  ./.percent.sh
+=======
+dialog --title "Welcome to easyAPT!" --infobox "This is version JUN30-V32 (June 30 Version 32), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
+>>>>>>> 2e9d1a073d10393c57eaa7344d1ef5632ccf3deb
 sleep 1
 #touch test.txt test2.txt test3.txt test4.txt output.txt
 apt >/dev/null 2>&1
