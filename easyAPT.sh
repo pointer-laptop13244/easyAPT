@@ -1,7 +1,10 @@
 #!/bin/bash
 clear
 echo "" > OUTPUT.txt
-dialog --title "Welcome to easyAPT!" --infobox "This is version JUN8-R4 (June 8 Revision 4), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
+#PERCENT=0
+#dialog --title "Welcome to easyAPT!" --stdout --gauge "This is version JUL8-V32 (July 8 Version 36), Github release N/A.  We are now starting up, this takes only a few seconds." 9 0 $PERCENT
+touch .percent.txt
+echo "00" > .percent.txt &&  ./.percent.sh
 sleep 1
 #touch test.txt test2.txt test3.txt test4.txt output.txt
 apt >/dev/null 2>&1
@@ -18,6 +21,7 @@ TEST1=$(cat test.txt)
 TEST2=$(cat test2.txt)
 TEST3=$(cat test3.txt)
 TEST4=$(cat test4.txt)
+echo "10" > .percent.txt &&  ./.percent.sh
 case "$TEST1" in
 	127)
 		#touch .msg.txt
@@ -33,7 +37,7 @@ case "$TEST1" in
 		echo "---"
 		echo "APT/dpkg is missing from your Linux distro."
 		echo "This may be because your system is not Debian/Ubuntu, or it got deleted."
-		echo "If it got deleted (and your system is Debian, Ubuntu, or another with the package manager, go to the offical help forums or do research to get the next steps."
+		echo "If it got deleted and your system is Debian, Ubuntu, or another with the package manager, go to the offical help forums or do research to get the next steps."
 		echo "---"
 		read -n 1 -p "easyAPT cannot continue. Press any key to exit."
 		clear
@@ -42,6 +46,9 @@ case "$TEST1" in
 	*)
 		;;
 esac
+#echo "20" | ./.percent.sh
+echo "20" > .percent.txt &&  ./.percent.sh
+
 case "$TEST2" in
 	127)
 		#touch .msg.txt
@@ -65,6 +72,9 @@ case "$TEST2" in
 	*)
 		;;
 esac
+#echo "30" | ./.percent.sh
+echo "30" > .percent.txt &&  ./.percent.sh
+
 case "$TEST3" in
 	127)
 		clear
@@ -82,6 +92,9 @@ case "$TEST3" in
 	*)
 		;;
 esac
+#echo "40" | ./.percent.sh
+echo "40" > .percent.txt &&  ./.percent.sh
+
 case "$TEST4" in
 	127)
 		#clear
@@ -106,6 +119,9 @@ case "$TEST4" in
 	*)
 		;;
 esac
+#echo "50" | ./.percent.sh
+echo "50" > .percent.txt &&  ./.percent.sh
+
 if [ "$EUID" -ne 0 ]; then
 	#dialog --title "Startup Failure" --msgbox "You are not running this with sudo access. If you have sudo access, try sudo ./easyAPT.sh, and if you don't, ask your admin for next steps."
 	#exit 5
@@ -129,6 +145,29 @@ if [ "$EUID" -ne 0 ]; then
 		
 
 fi
+#echo "60" | ./.percent.sh
+echo "60" > .percent.txt &&  ./.percent.sh
+
+test /dev/null
+case "$?" in
+	0)
+		;;
+	*)
+		clear
+		echo "easyAPT PANIC"
+		echo "Code 00"
+		echo "---"
+		echo "Your /dev/null file was not found. That is required for normal operation."
+		echo "Please repair it."
+		echo "---"
+		read -n 1 -p "easyAPT cannot continue. Press any key to exit."
+		clear
+		exit 1
+		;;
+esac
+#echo "70" | ./.percent.sh
+echo "70" > .percent.txt &&  ./.percent.sh
+
 #dialog --title "" --infobox --stdout "If you hear a beep, it is normal testing procedure." 0 0
 #Something I overlooked while testing is that beep doesn't work under root. Removing all instances of it."
 #beep
@@ -150,6 +189,10 @@ fi
 	#	esac
 
 sleep 2
+echo "80" > .percent.txt &&  ./.percent.sh
+echo "90" > .percent.txt &&  ./.percent.sh
+echo "100" > .percent.txt &&  ./.percent.sh
+sleep 2
 CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option below. Use the UP and DOWN arrow keys to navigate the menu and use the space/enter key to select the option. " 0 0 0 \
 	"1" "Remove unrequired packages" \
 	"2" "Fix incomplete install" \
@@ -165,7 +208,10 @@ CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option
 	"12" "Custom Command" \
 	"13" "See last command output" \
 	"14" "Check for tool updates" \
-	"15" "Quit to terminal/desktop")
+	"15" "Quit to terminal/desktop" \
+	"16" "About easyAPT" \
+	"17" "Report a bug/issue" \
+	"18" "Setup Github")
 
 exitstatus=$?
 
@@ -651,7 +697,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 			"apt-get" "Apt utility meant for scripts (recommended)" \
 			"apt-cache" "Searching and getting info about packages" \
 			"apt-mark" "Package Marker" \
-			"dpkg" "APT package managing engine (only recommended for those who know what they are doing)" \
+			"dpkg" "APT package management engine (only recommended for those who know what they are doing)" \
 			"ping" "Internet connection tester" \
 			"bash" "Standard terminal shell" \
 			"sh" "Standard terminal shell" \
@@ -822,5 +868,38 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 				exit 0
 				;;
 		esac
+		;;
+	16)
+		
+		echo "A moment, please...."
+		sleep 3
+		touch about.txt
+		ABOUT=$(cat .version)
+		ABOUT2=$(cat .version2)
+		touch about.txt
+		echo "easyAPT version ID: $ABOUT" >> about.txt
+		echo "easyAPT version ID (Reported GitHub version): $ABOUT2" >> about.txt
+		echo "If '$ABOUT' and '$ABOUT2' are not the same, run the easyAPT updater." >> about.txt
+		echo " " >> about.txt
+		echo "easyAPT - Making package installation easier" >> about.txt
+		echo "Version JUL8-V36 (July 8 Version 36), Github release N/A (not yet!)" >> about.txt
+		echo "Beta Edition - from Github" >> about.txt
+		echo " " >> about.txt
+		echo "Licensing information: none yet (Since this is going to be public, soon.)" >> about.txt
+		echo " " >> about.txt
+		echo "Made with care by p14277376. Hope you enjoy!" >> about.txt
+		echo "You can see my other projects by going to my Github page." >> about.txt
+		dialog --title "About easyAPT" --exit-label "OK" --stdout --textbox about.txt 0 0
+		rm about.txt
+		./easyAPTmenu.sh
+		exit 0
+		;;
+	17)
+		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		;;
+	18)
+		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		./easyAPTmenu.sh
+		exit
 		;;
 esac
