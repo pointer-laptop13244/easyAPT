@@ -34,18 +34,38 @@ case "$CHOICE" in
 				dialog --title "" --yesno --stdout "Now that your account is made, would you like to login into it now? You can always log out later (and this script may do it for you.)" 0 0
 				case "$?" in
 					0)
+						clear
+						git auth login
+						case "$?" in
+							0)
+								exit
+								;;
+							*)
+								exit $?
+								;;
+						esac
 						;;
 					1)
+						dialog --title "Error (code $?)" --msgbox --stdout "Something went wrong while authorizing, or the user canceled. The Account Setup has failed, so the operation you tried to complete will terminate and you'll go back to the main menu." 0 0
 						;;
 					255)
+						dialog --title "Error (code $?)" --msgbox --stdout "Something went wrong while authorizing, or the user canceled. The Account Setup has failed, so the operation you tried to complete will terminate and you'll go back to the main menu." 0 0
 						;;
 				esac
 				;;
 			2)
 				xdg-open https://github.com/signup
 				dialog --title "Create an Account" --msgbox --stdout "When your account it ready, push OK." 0 0
+				./.easyaptgithub.sh
+				exit 0
 				;;
 			3)
+				exit 1
 				;;
 		esac
-
+		;;
+	"Cancel")
+		dialog --title "Error" --msgbox --stdout "Something went wrong while authorizing, or the user canceled. The Account Setup has failed, so the operation you tried to complete will terminate and you'll go back to the main menu." 0 0
+	
+		;;
+esac

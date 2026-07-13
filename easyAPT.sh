@@ -1,14 +1,12 @@
 #!/bin/bash
 clear
 echo "" > OUTPUT.txt
-<<<<<<< HEAD
 #PERCENT=0
 #dialog --title "Welcome to easyAPT!" --stdout --gauge "This is version JUL8-V32 (July 8 Version 36), Github release N/A.  We are now starting up, this takes only a few seconds." 9 0 $PERCENT
 touch .percent.txt
 echo "00" > .percent.txt &&  ./.percent.sh
-=======
-dialog --title "Welcome to easyAPT!" --infobox "This is version JUN30-V32 (June 30 Version 32), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
->>>>>>> 2e9d1a073d10393c57eaa7344d1ef5632ccf3deb
+#=======
+#dialog --title "Welcome to easyAPT!" --infobox "This is version JUN30-V32 (June 30 Version 32), Github release N/A.  We are now starting up, this takes only a few seconds." 0 0
 sleep 1
 #touch test.txt test2.txt test3.txt test4.txt output.txt
 apt >/dev/null 2>&1
@@ -81,17 +79,31 @@ echo "30" > .percent.txt &&  ./.percent.sh
 
 case "$TEST3" in
 	127)
+		#clear
+		#echo "Please wait, installing a required package."
+		#echo "Do NOT interupt this process or you'll end up with easy to fix issues."
+		#echo "Make sure you are running this as root, or you'll experience more issues."
+		#echo "Starting in 5 seconds"
+		#sleep 5
+		#echo "Started"
+		#apt install dialog -y >/dev/null 2>&1
+		#echo ""
+		#echo "Finished, run the script again"
+		#exit 0
+		echo "easyAPT PANIC"
+		echo "Code 52"
+		echo "---"
+		#echo "APT/dpkg is missing from your Linux distro."
+		#echo "This may be because your system is not Debian/Ubuntu, or it got deleted."
+		#echo "If it got deleted and your system is Debian, Ubuntu, or another with the package manager, go to the offical help forums or do research to get the next steps."
+		echo "The dialog package was not found on your system."
+		echo "That package powers all the TUI elements of this tool."
+		echo "You should try 'sudo apt install dialog' if you have root access. Or, ask your admin for next steps."
+		echo "---"
+		read -n 1 -p "easyAPT cannot continue. Press any key to exit."
 		clear
-		echo "Please wait, installing a required package."
-		echo "Do NOT interupt this process or you'll end up with easy to fix issues."
-		echo "Make sure you are running this as root, or you'll experience more issues."
-		echo "Starting in 5 seconds"
-		sleep 5
-		echo "Started"
-		apt install dialog -y >/dev/null 2>&1
-		echo ""
-		echo "Finished, run the script again"
-		exit 0
+		exit 19
+	
 		;;
 	*)
 		;;
@@ -215,7 +227,8 @@ CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option
 	"15" "Quit to terminal/desktop" \
 	"16" "About easyAPT" \
 	"17" "Report a bug/issue" \
-	"18" "Setup Github")
+	"18" "Setup Github" \
+	"19" "Deauthorize Github")
 
 exitstatus=$?
 
@@ -350,6 +363,9 @@ case "$CHOICE" in
 				esac
 				;;
 			4)
+				dialog --title "Locked" --msgbox --stdout "This operation is locked because it is currently unstable. Push OK to go back to the menu." 0 0
+				./easyAPTmenu.sh
+				exit 
 				dialog --title "Operation" --infobox "Please wait, we are checking for required packages and installing them if needed. Be patient, as this can either take a few seconds or a few minutes." 0 0
 				alien --noninteractive &>/dev/null 2>&1
 				case "$?" in
@@ -426,6 +442,10 @@ case "$CHOICE" in
 				;;
 			5)
 		
+				dialog --title "Locked" --msgbox --stdout "This operation is locked because it is currently unstable. Push OK to go back to the menu." 0 0
+				./easyAPTmenu.sh
+				exit 
+
 				dialog --title "Operation" --infobox "Please wait, we are checking for required packages and installing them if needed. Be patient, as this can either take a few seconds or a few minutes." 0 0
 				alien --noninteractive &>/dev/null 2>&1
 				case "$?" in
@@ -886,7 +906,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		echo "If '$ABOUT' and '$ABOUT2' are not the same, run the easyAPT updater." >> about.txt
 		echo " " >> about.txt
 		echo "easyAPT - Making package installation easier" >> about.txt
-		echo "Version JUL8-V36 (July 8 Version 36), Github release N/A (not yet!)" >> about.txt
+		echo "Version JUL13-V52 (July 8 Version 52), Github release N/A (not yet!)" >> about.txt
 		echo "Beta Edition - from Github" >> about.txt
 		echo " " >> about.txt
 		echo "Licensing information: none yet (Since this is going to be public, soon.)" >> about.txt
@@ -900,10 +920,50 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		;;
 	17)
 		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
+		clear
+		echo "Please wait..."
+		sleep 3
+		gh issue create -R pointer-laptop13244/easyAPT
+		case "$?" in
+			0)
+				./easyAPTmenu.sh
+				exit
+				;;
+			*)
+				dialog --title "Error $?" --msgbox --stdout "An unknown error occured." 0 0
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
 		;;
 	18)
 		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
 		./easyAPTmenu.sh
 		exit
 		;;
+	19)
+		dialog --title "Logoff" --yesno --stdout "Are you sure you would like to deauthorize your device from your Github account?" 0 0
+		case "$?" in
+			0)
+				clear
+				gh auth logout
+				./easyAPTmenu.sh
+				exit
+				;;
+			*)
+				clear
+				./easyAPTmenu.sh
+				exit
+				;;
+
+		esac
 esac
+#Clean up scripts go here...
