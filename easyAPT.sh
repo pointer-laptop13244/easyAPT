@@ -238,11 +238,7 @@ CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option
 	"17" "Report a bug/issue" \
 	"18" "Setup Github" \
 	"19" "Deauthorize Github" \
-	"20" "Github Status" \
-	"21" "" \
-	"22" "" \
-	"23" "" \
-	"24" "")
+	"20" "Github Status")
 
 exitstatus=$?
 

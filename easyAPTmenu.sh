@@ -1,3 +1,759 @@
-dialog --title "Redirection" --infobox "The creator is getting tired of having to type :!./easyAPT.sh everytime he chooses an option. Until the original easyAPT script is ready and bugchecked, this is a redirectional script to the main menu. Please wait..." 0 0
+dialog --title "" --infobox "Loading menu..." 0 0
 sleep 2
-./easyAPT.sh
+CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option below. Use the UP and DOWN arrow keys to navigate the menu and use the space/enter key to select the option. " 0 0 0 \
+	"1" "Remove unrequired packages" \
+	"2" "Fix incomplete install" \
+	"3" "Install a package" \
+	"4" "Search for a package" \
+	"5" "List all installed packages" \
+	"6" "Remove a package" \
+	"7" "Remove a package + all config files" \
+	"8" "Mark a package as something" \
+	"9" "Update Repository" \
+	"10" "Upgrade Packages + Repository" \
+	"11" "Do an internet test" \
+	"12" "Custom Command" \
+	"13" "See last command output" \
+	"14" "Check for tool updates" \
+	"15" "Quit to terminal/desktop" \
+	"16" "About easyAPT" \
+	"17" "Report a bug/issue" \
+	"18" "Setup Github" \
+	"19" "Deauthorize Github" \
+	"20" "Github Status")
+
+exitstatus=$?
+
+case "$CHOICE" in
+	1)
+		dialog --title "Operation" --infobox "Please wait while we remove all unrequired packages." 0 0
+		sleep 1
+		touch OUTPUT.txt
+		apt autoremove -y > OUTPUT.txt
+		OPERATION_STATUS=$?
+		sleep 1
+		case "$OPERATION_STATUS" in
+			"0")
+				dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+			*)
+				dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	2)
+		dialog --title "Operation" --infobox "Please wait while we fix all broken packages." 0 0
+		sleep 1
+		touch OUTPUT.txt
+		dpkg --configure -a >> OUTPUT.txt
+		OPERATION_STATUS=$?
+		sleep 1
+		case "$OPERATION_STATUS" in
+			"0")
+				dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+			*)
+				dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	3)
+		CHOICE2=$(dialog --title "Package Installation" --nocancel --stdout --menu "How would you like to install the package? Choose an option below and click space/enter." 0 0 0 \
+			"1" "I want to enter the name of the package I want to install." \
+			"2" "I want to search for a package first." \
+			"3" "I want to install a local .deb package." \
+			"4" "I want to convert a local .rpm to a .deb, then install that." \
+			"5" "I just want to convert the local .rpm to a .deb." \
+			"6" "I want to go back to the main menu")
+		case "$CHOICE2" in
+			1)
+				CHOICE3=$(dialog --title "Package Installation" --inputbox --stdout "Type the exact name of the package you want to install." 0 0)
+				STATUS=$?
+				case "$STATUS" in
+					0)
+						dialog --title "Package Installation" --infobox "We are now installing your package, please be patient." 0 0
+						touch OUTPUT.txt
+						apt-get install "$CHOICE3" -y >> OUTPUT.txt 2>&1
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+					*)
+						dialog --title "" --infobox "Loading menu..." 0 0
+						sleep 1
+						./easyAPTmenu.sh
+						;;
+				esac
+				;;
+
+			2)
+				CHOICE3=$(dialog --title "Package Installation" --nocancel --inputbox --stdout "What is the package you'd like to search for? Type it below and hit enter." 0 0)
+				dialog --title "" --msgbox "On the next screen, you'll see a list of packages you could install. Take a note of the package you want to install." 0 0
+				dialog --title "" --infobox "Searching..." 0 0
+			        touch OUTPUT.txt	
+				apt-cache search "$CHOICE3" >> OUTPUT.txt
+				dialog --title "Package list" --textbox OUTPUT.txt 0 0
+				CHOICE3=$(dialog --title "Package Installation" --inputbox --stdout "Type the exact name of the package you want to install." 0 0)
+				STATUS=$?
+				case "$STATUS" in
+					0)
+						dialog --title "Package Installation" --infobox "We are now installing your package, please be patient." 0 0
+						touch OUTPUT.txt
+						apt-get install "$CHOICE3" -y >> OUTPUT.txt 2>&1
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+					*)
+						dialog --title "" --infobox "Loading menu..." 0 0
+						sleep 1
+						./easyAPTmenu.sh
+						;;
+				esac
+				;;
+			3)
+				CHOICE4=$(dialog --title "Choose a valid .deb" --stdout --fselect ~ 0 0)
+				case "$?" in
+					0)
+						dialog --title "Package Installation" --infobox "We are now installing your package, please be patient."  0 0 
+						touch OUTPUT.txt
+						apt-get install "$CHOICE4" -y >> OUTPUT.txt 2>&1
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+					*)
+						dialog --title "" --infobox "Loading menu..." 0 0
+						sleep 1
+						./easyAPTmenu.sh
+						;;
+				esac
+				;;
+			4)
+				dialog --title "Locked" --msgbox --stdout "This operation is locked because it is currently unstable. Push OK to go back to the menu." 0 0
+				./easyAPTmenu.sh
+				exit 
+				dialog --title "Operation" --infobox "Please wait, we are checking for required packages and installing them if needed. Be patient, as this can either take a few seconds or a few minutes." 0 0
+				alien --noninteractive &>/dev/null 2>&1
+				case "$?" in
+					127)
+						apt-get install alien -y >/dev/null 2>&1
+						case "$?" in
+							0)
+								;;
+							*)
+								dialog --title "Something went wrong!" --msgbox "Unknown apt error $?. Push space/enter to go back to the main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						apt-get install fakeroot -y >/dev/null 2>&1
+						case "$?" in
+							0)
+								;;
+							*)
+								dialog --title "Something went wrong!" --msgbox "Unknown apt error $?. Push space/enter to go back to the main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+					*)
+						fakeroot
+						case "$?" in
+							127)
+								apt-get install fakeroot -y >/dev/null 2>&1
+								case "$?" in
+									0)
+										;;
+									*)
+										dialog --title "Something went wrong!" --msgbox "Unknown apt error $?. Push space/enter to go back to the main menu." 0 0
+										./easyAPTmenu.sh
+										;;
+								esac
+								;;
+							*)
+								;;
+						esac
+						;;
+				esac
+				sleep 5
+				dialog --title "Operation Finished" --infobox "Finished, please wait..." 0 0
+				CHOICE5=$(dialog --title "Choose .rpm" --stdout --fselect ~ 0 0)
+				dialog --title "" --infobox "Please wait, converting your package" 0 0
+				touch OUTPUT.txt
+				echo "--------> ALIEN converter" >> OUTPUT.txt
+				fakeroot alien --noninteractive --to-deb "$CHOICE5" >> OUTPUT.txt 2>&1
+				case "$?" in
+					0)
+						dialog --title "" --infobox "Please wait, installing your package" 0 0 
+						echo "-------> APT installer" >> OUTPUT.txt
+						CHOICE6=$(dialog --title "Choose your new .deb" --fselect ~ 0 0)
+						dialog --title "" --infobox "We are installing your package, please be patient..." 0 0
+						apt-get install "$CHOICE6" -y >> OUTPUT.txt 2>&1
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+
+					*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+				esac
+				;;
+			5)
+		
+				dialog --title "Locked" --msgbox --stdout "This operation is locked because it is currently unstable. Push OK to go back to the menu." 0 0
+				./easyAPTmenu.sh
+				exit 
+
+				dialog --title "Operation" --infobox "Please wait, we are checking for required packages and installing them if needed. Be patient, as this can either take a few seconds or a few minutes." 0 0
+				alien --noninteractive &>/dev/null 2>&1
+				case "$?" in
+					127)
+						apt-get install alien -y >/dev/null 2>&1
+						case "$?" in
+							0)
+								;;
+							*)
+								dialog --title "Something went wrong!" --msgbox "Unknown apt error $?. Push space/enter to go back to the main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						apt-get install fakeroot -y >/dev/null 2>&1
+						case "$?" in
+							0)
+								;;
+							*)
+								dialog --title "Something went wrong!" --msgbox "Unknown apt error $?. Push space/enter to go back to the main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+					*)
+						fakeroot
+						case "$?" in
+							127)
+								apt-get install fakeroot -y >/dev/null 2>&1
+								case "$?" in
+									0)
+										;;
+									*)
+										dialog --title "Something went wrong!" --msgbox "Unknown apt error $?. Push space/enter to go back to the main menu." 0 0
+										./easyAPTmenu.sh
+										;;
+								esac
+								;;
+							*)
+								;;
+						esac
+						;;
+				esac
+				sleep 5
+				dialog --title "Operation Finished" --infobox "Finished, please wait..." 0 0
+				CHOICE5=$(dialog --title "Choose .rpm" --fselect ~ 0 0)
+				dialog --title "" --infobox "Please wait, converting your package" 0 0
+				touch OUTPUT.txt
+				echo "--------> ALIEN converter" >> OUTPUT.txt
+				fakeroot alien --to-deb "$CHOICE5" >> OUTPUT.txt 2>&1
+				case "$?" in
+					0)
+						dialog --title "Done" --msgbox "Finished successfully (exit $?), push enter/space to go back to the menu"
+						./easyAPTmenu.sh
+						;;
+					*)
+						dialog --title "Done" --msgbox "Finished unsuccessfully (exit $?), push enter/space to go back to the menu"
+						./easyAPTmenu.sh
+						;;
+				esac
+				;;
+		6)
+			./easyAPTmenu.sh
+			;;
+	     esac
+	     ;;
+	4)
+		CHOICE3=$(dialog --title "Package Installation" --nocancel --inputbox --stdout "What is the package you'd like to search for? Type it below and hit enter." 0 0)
+				dialog --title "" --msgbox "On the next screen, you'll see a list of packages you could install. Take a note of the package you want to install." 0 0
+				dialog --title "" --infobox "Searching..." 0 0
+			        touch OUTPUT.txt	
+				apt-cache search "$CHOICE3" >> OUTPUT.txt
+				dialog --title "Package list" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+	5)
+		CHOICE22=$(dialog --title "What to list" --nocancel --stdout --menu "Choose the packages to list." 0 0 0 \
+			"1" "Only Installed Packages" \
+			"2" "Only Not Installed Packages" \
+			"3" "All packages that system knows about" \
+			"4" "Custom flags" \
+			"5" "Go back to main menu")
+		case "$CHOICE22" in
+			4)
+				;;
+		
+			5)
+				;;
+			*)
+				CHOICE6=$(dialog --title "Filter by" --nocancel --inputbox --stdout "What is the package you'd like to filter the list by? (If you don't want to, enter nothing and continue.)" 0 0)
+				;;
+		esac
+		#divider
+		case "$CHOICE22" in
+			1)
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $CHOICE6 --installed >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			2)
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $CHOICE6 '!~i' >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			3)
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $CHOICE6 >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			4)
+				FLAGS=$(dialog --title "Choose your flags" --nocancel --inputbox --stdout "Choose your custom flags at the end of the command." 0 0  "<filter> -fun --flags")
+				dialog --title "" --infobox "Searching..." 0 0
+				touch OUTPUT.txt
+				apt list $FLAGS >> OUTPUT.txt
+				dialog --title "List" --textbox OUTPUT.txt 0 0
+				./easyAPTmenu.sh
+				;;
+			5)
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+
+	6)
+		CHOICE99=$(dialog --title "Package Removal" --inputbox --stdout "Type the package you'd like to remove. This keeps the configuration files that it used for reinstallation later. If you don't want to keep those files, click cancel, and then click 'Remove a package + all config files'." 0 0 "Replace with package to remove")
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				;;
+		esac
+		dialog --title "Operation" --infobox --stdout "Please wait...." 0 0
+		touch OUTPUT.txt
+		apt-get remove $CHOICE99 -y >> OUTPUT.txt
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+	7)
+CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package you'd like to remove. This removes the configuration files that it used for reinstallation later. If you don't want to remove those files, click cancel, and then click 'Remove a package'." 0 0 "Replace with package to remove")
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				;;
+		esac
+		dialog --title "Operation" --infobox --stdout "Please wait." 0 0
+		touch OUTPUT.txt
+		apt-get purge $CHOICE99 -y >> OUTPUT.txt
+						case "$?" in
+							"0")
+								dialog --title "Operation Results" --msgbox "Operations were successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						       	*)
+								dialog --title "Operation Results" --msgbox "Operations were NOT successful (exit code $?). Space/Enter goes back to main menu." 0 0
+								./easyAPTmenu.sh
+								;;
+						esac
+						;;
+	8)
+		CHOICE29=$(dialog --title "Package" --nocancel --stdout --inputbox "Type the package to mark as something" 0 0 "" )
+		sleep 2
+		CHOICE35=$(dialog --title "Mark the selected package as..." --nocancel --stdout --menu "Choose what to mark the package as..." 0 0 0 \
+		       "hold" "Hold it" \
+	       	       "unhold" "Unhold it" \
+		       "auto" "Auto" \
+		       "manual" "Manual" \
+		       "Back" "Back to main menu")
+ 		case "$CHOICE35" in
+			"Back")
+				./easyAPTmenu.sh
+				;;
+			*)
+				touch OUTPUT.txt
+				apt-mark $CHOICE35 $CHOICE29 >> OUTPUT.txt
+				case "$?" in
+					0)
+						dialog --title "Results" --msgbox --stdout "Operations were successful with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+					*)
+						dialog --title "Results" --msgbox --stdout "Operations failed with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+				esac
+				;;
+		esac
+		;;
+	9)
+		dialog --title "Operation" --infobox "Updating the repository, please wait..." 0 0
+		touch OUTPUT.txt
+		apt-get update -y >> OUTPUT.txt
+		case "$?" in
+					0)
+						dialog --title "Results" --msgbox --stdout "Operations were successful with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+					*)
+						dialog --title "Results" --msgbox --stdout "Operations failed with code $?. Click Space/Enter to go back to main menu" 0 0
+						./easyAPTmenu.sh
+						;;
+				esac
+				;;
+	10)
+		dialog --title "Operation 1/3" --infobox "Updating the packages, please wait..." 0 0
+		touch OUTPUT.txt
+		echo "-------> Step One" >> OUTPUT.txt
+		apt-get update -y >> OUTPUT.txt
+		case "$?" in
+			0)
+				dialog --title "Operation 2/3" --infobox "Success code $?, continuing." 0 0
+				;;
+			*)
+				dialog --title "Operation 1/3" --msgbox --stdout "Operation terminated because of error $?. Click enter to go back." 0 0
+				./easyAPT.sh
+				exit 0
+				;;
+		esac
+		echo "------> Step Two" >> OUTPUT.txt
+		apt-get upgrade -y >> OUTPUT.txt
+		case "$?" in
+			0)
+				dialog --title "Operation 3/3" --infobox "Success code $?, continuing." 0 0
+				;;
+			*)
+				dialog --title "Operation 2/3" --msgbox --stdout "Operation terminated because of error $?. Click enter to go back." 0 0
+				./easyAPTmenu.sh
+				exit 0
+				;;
+		esac
+		echo "------> Step Three" >> OUTPUT.txt
+		apt-get dist-upgrade -y >> OUTPUT.txt
+		case "$?" in 
+			0)
+				dialog --title "Operation Finished - 3/3" --msgbox --stdout "Operation finished with code $?, click enter/space to go back." 0 0
+				./easyAPTmenu.sh
+				;;
+			*)
+				dialog --title "Operation Failed - 3/3" --msgbox --stdout "Operation 3 failed with error $?, click enter/space to go back." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	11)
+		dialog --title "Operation" --infobox "Finishing Internet Test, please wait..." 0 0
+		touch OUTPUT.txt
+		ping -W 10 -c 10 8.8.8.8 >> OUTPUT.txt
+		case "$?" in
+			0)
+				dialog --title "Operation Results" --msgbox --stdout "Internet connection test was a success! You can use all features of this tool." 0 0
+				./easyAPTmenu.sh 
+				;;
+			*)
+				dialog --title "Operation Results" --msgbox --stdout "Internet connection test wasn't a success. First, try going back to the menu and making sure 'iputils-ping' is installed. If it is, check your internet connection." 0 0
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	12)
+		CHOICES=$(dialog --title "Custom Command" --stdout --nocancel --menu "Choose an option below of what frontend you want to submit your command to." 0 0 0 \
+			"apt" "Standard apt utility (not recommended)" \
+			"apt-get" "Apt utility meant for scripts (recommended)" \
+			"apt-cache" "Searching and getting info about packages" \
+			"apt-mark" "Package Marker" \
+			"dpkg" "APT package management engine (only recommended for those who know what they are doing)" \
+			"ping" "Internet connection tester" \
+			"bash" "Standard terminal shell" \
+			"sh" "Standard terminal shell" \
+			"gh" "Github Tools" \
+			"git" "Github Tools" \
+			"" "Other terminal shell" \
+			"back" "Go back to the main menu")
+		#echo "Break"
+		#exit
+		case "$CHOICES" in
+			"back")
+				./easyAPTmenu.sh
+				;;
+			*)
+				COMMAND=$(dialog --title "Command" --inputbox --stdout "Type your command below, flags and all." 0 0 "type your command here --including -all --the-very -fun --flags") 
+				clear
+				echo "The menu has been hidden so you can see all output of the command."
+				echo ""
+				echo "Once it has been exited, you will have access to the menu."
+				echo "Starting in 3 seconds"
+				sleep 3
+				echo "---"
+				$CHOICES $COMMAND
+				exitSTAT=$?
+				sleep 2
+				echo "---"
+				echo "Done, shell exit code $exitSTAT"
+				read -p "Hit enter to go back to the menu, push CTRL+C to exit to the command prompt"
+				./easyAPTmenu.sh
+				;;
+		esac
+		;;
+	13)
+		dialog --title "Last command output" --textbox OUTPUT.txt 0 0
+		./easyAPTmenu.sh
+		;;
+	14)
+		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		clear
+		#su -
+		case "$?" in
+			0)
+				;;
+			*)
+				dialog --title "Error" --msgbox --stdout "The easyAPT github setup failed. This requires Github services to work." 0 0
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
+		sudo -u "$SUDO_USER" beep >/dev/null 2>&1
+		case "$?" in
+			0)
+				;;
+			*)
+				clear
+				echo "Looks like we couldn't make a beep sound. Pretend there is one."
+				read -p "Push enter to continue."
+				;;
+		esac
+		dialog --title "Warning!" --yesno --stdout "This is a beta feature that may be unstable and may delete the wrong files. You may want to back up your files before continuing. Or, don't continue at all - you're doing this at your own risk. Make sure to report any bugs with the easyAPT issue reporter. Do you want to continue?" 0 0
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
+		#./easyAPTmenu.sh
+		#exit
+		dialog --title "Update" --stdout --yesno "Would you like to install the latest version of easyAPT?" 0 0
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
+		EASYAPTDIR=$(dialog --title "Choose easyAPT directory" --stdout --dselect $PWD/easyAPT 0 0)
+		dialog --title "Update" --infobox "We are now updating easyAPT, please wait."0 0 0
+		cd /
+		cd "$EASYAPTDIR"
+		#mkdir easyAPT
+		#cd easyAPT
+		#clear
+		sudo -u $SUDO_USER gh release download --repo pointer-laptop13244/easyAPT --pattern $EASYAPTFILENAME >/dev/null 2>&1 
+		#echo "Break"
+		#exit
+		case "$?" in
+			0)
+				;;
+			*)
+				cd ..
+				rm -rf easyAPT
+				#echo "Break"
+				#echo "Current directory: $PWD"
+				#exit
+				dialog --title "Error code $?" --msgbox --stdout "Failed to update easyAPT. Your existing installation is still safe." 0 0
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
+		cd $EASYAPTDIR
+		unzip $EASYAPTFILE -d $EASYAPTDIR/easyAPT >/dev/null 2>&1
+		chmod +x *.sh
+		#touch ../output.txt
+		#dir >> ../output.txt
+		cd ..
+		mv easyAPT.sh easyAPT
+		rm *.sh
+		rm *.txt
+		mv easyAPT easyAPT.sh
+		clear
+		echo "Installation seems to be finished. Go into the new easyAPT folder and run easyAPT."
+		echo "Finishing up"
+		rm easyAPT.sh
+		rm .*
+		echo "Done."
+		exit
+		;;	
+	15)
+		dialog --title "Exit" --yesno --stdout "Are you sure you want to leave easyAPT? You can relaunch it anytime by typing sudo ./easyAPT.sh." 0 0
+		case "$?" in
+			0)
+				clear
+				exit 0
+				;;
+			*)
+				./easyAPTmenu.sh
+				exit 0
+				;;
+		esac
+		;;
+	16)
+		
+		echo "A moment, please...."
+		sleep 3
+		touch about.txt
+		ABOUT=$(cat .version)
+		ABOUT2=$(cat .version2)
+		touch about.txt
+		echo "easyAPT version ID: $ABOUT" >> about.txt
+		echo "easyAPT version ID (Reported GitHub version): $ABOUT2" >> about.txt
+		echo "If '$ABOUT' and '$ABOUT2' are not the same, run the easyAPT updater." >> about.txt
+		echo " " >> about.txt
+		echo "easyAPT - Making package installation easier" >> about.txt
+		echo "Version JUL18-V102 (July 18 Version 102), Github release 1.0.2" >> about.txt
+		#echo "Beta Edition - from Github" >> about.txt
+		echo "Stable Edition - from Github" >> about.txt
+		echo " " >> about.txt
+		#echo "Licensing information: none yet (Since this is going to be public, soon.)" >> about.txt
+		echo " " >> about.txt
+		echo "Made with care by p14277376. Hope you enjoy!" >> about.txt
+		echo "You can see my other projects by going to my Github page." >> about.txt
+		dialog --title "About easyAPT" --exit-label "OK" --stdout --textbox about.txt 0 0
+		rm about.txt
+		./easyAPTmenu.sh
+		exit 0
+		;;
+	17)
+		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
+		clear
+		echo "Please wait..."
+		sleep 3
+		sudo -u "$SUDO_USER" gh issue create -R pointer-laptop13244/easyAPT
+		sleep 3
+		echo "---"
+		case "$?" in
+			0)
+				echo "Finished successfully with code $?. Just give it a few days, make sure you're subscribed to the Github project, and remember to check your email that your Github account is linked to; replies to the issue get sent there."
+				;;
+			*)
+				#dialog --title "Error $?" --msgbox --stdout "An unknown error occured." 0 0
+				#./easyAPTmenu.sh
+				#exit
+				echo "An error -- code $? -- occured and the issue may not have been sent. Try going to the issues page in your web browser."
+				;;
+		esac
+	        echo ""
+		read -p "Push enter to go to the easyAPT menu. Push CTRL+C to go to a command prompt."
+		./easyAPTmenu.sh
+		exit	
+		;;
+	18)
+		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		./easyAPTmenu.sh
+		exit
+		;;
+	19)
+		dialog --title "Logoff" --yesno --stdout "Are you sure you would like to deauthorize your device from your Github account?" 0 0
+		case "$?" in
+			0)
+				clear
+				gh auth logout
+				sleep 2
+				case "$?" in
+					0)
+						echo "Success, code $?"
+						;;
+					*)
+						echo "Failure, code $?"
+						;;
+				esac
+				read -p "Push Enter to continue, CTRL+C to quit to the command prompt"
+				./easyAPTmenu.sh
+				exit
+				;;
+			*)
+				clear
+				./easyAPTmenu.sh
+				exit
+				;;
+
+		esac
+		;;
+	20)
+		clear
+		echo "This is the Github login status. If you're not logged in, some features are limited. You can log in using the Github Setup tool in the main menu."
+		echo "---"
+		sleep 3
+		sudo -u "$SUDO_USER" gh auth status
+		exitstat=$?
+		sleep 1
+		echo "---"
+		echo "Finished, exit code $exitstat"
+		read -p "Push enter to go back to easyAPT, CTRL+C to go to the command prompt."
+		./easyAPTmenu.sh
+		exit
+		;;
+esac
