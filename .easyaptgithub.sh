@@ -3,11 +3,19 @@ CHOICE=$(dialog --title "easyAPT Github Account Setup" --stdout --nocancel --men
 			"Yes" "I have a Github account, and logged into and authorized it on this device." \
 	       		"Almost" "I have a Github account, but haven't authorized it yet." \
 			"Not at all" "I don't even have a Github account" \
+			"Not sure" "I don't know." \
 			"Cancel" "Quit Account Setup")
 case "$CHOICE" in
 	"Yes")
 		dialog --title "Finished" --msgbox --stdout "The Github Account setup is complete. You can now continue to the next step of the operation you are trying to complete." 0 0
 		exit 0
+		;;
+	"Not sure")
+		clear
+		gh auth status
+		echo "---"
+		read -p "Push enter to continue, ctrl+c to cancel."
+		./.easyaptgithub.sh
 		;;
 	"Almost")
 		dialog --title "" --msgbox --stdout "On the next screen, you'll see Github Account authorization steps. Simply answer the questions." 0 0

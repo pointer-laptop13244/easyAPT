@@ -1,4 +1,13 @@
 #!/bin/bash
+#In the Github release, what is the main easyAPT ZIP file called? In the line below, change 'HERE' to the actual filename.
+EASYAPTFILENAME='HERE'
+
+
+
+
+
+
+
 clear
 echo "" > OUTPUT.txt
 #PERCENT=0
@@ -228,7 +237,12 @@ CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option
 	"16" "About easyAPT" \
 	"17" "Report a bug/issue" \
 	"18" "Setup Github" \
-	"19" "Deauthorize Github")
+	"19" "Deauthorize Github" \
+	"20" "Github Status" \
+	"21" "" \
+	"22" "" \
+	"23" "" \
+	"24" "")
 
 exitstatus=$?
 
@@ -531,6 +545,8 @@ case "$CHOICE" in
 			4)
 				;;
 		
+			5)
+				;;
 			*)
 				CHOICE6=$(dialog --title "Filter by" --nocancel --inputbox --stdout "What is the package you'd like to filter the list by? (If you don't want to, enter nothing and continue.)" 0 0)
 				;;
@@ -573,7 +589,7 @@ case "$CHOICE" in
 		;;
 
 	6)
-		CHOICE99=$(dialog --title "Package Removal" --inputbox --stdout "Type the package you'd like to remove. This keeps the configuration files that it used for reinstallation later. If you don't want to keep those files, click cancel, and then click 'Remove a package + all config files'.." 0 0 "Replace with package to remove")
+		CHOICE99=$(dialog --title "Package Removal" --inputbox --stdout "Type the package you'd like to remove. This keeps the configuration files that it used for reinstallation later. If you don't want to keep those files, click cancel, and then click 'Remove a package + all config files'." 0 0 "Replace with package to remove")
 		case "$?" in
 			0)
 				;;
@@ -581,6 +597,7 @@ case "$CHOICE" in
 				./easyAPTmenu.sh
 				;;
 		esac
+		dialog --title "Operation" --infobox --stdout "Please wait...." 0 0
 		touch OUTPUT.txt
 		apt-get remove $CHOICE99 -y >> OUTPUT.txt
 						case "$?" in
@@ -595,7 +612,7 @@ case "$CHOICE" in
 						esac
 						;;
 	7)
-CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package you'd like to remove. This removes the configuration files that it used for reinstallation later. If you don't want to remove those files, click cancel, and then click 'Remove a package'.." 0 0 "Replace with package to remove")
+CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package you'd like to remove. This removes the configuration files that it used for reinstallation later. If you don't want to remove those files, click cancel, and then click 'Remove a package'." 0 0 "Replace with package to remove")
 		case "$?" in
 			0)
 				;;
@@ -603,6 +620,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 				./easyAPTmenu.sh
 				;;
 		esac
+		dialog --title "Operation" --infobox --stdout "Please wait." 0 0
 		touch OUTPUT.txt
 		apt-get purge $CHOICE99 -y >> OUTPUT.txt
 						case "$?" in
@@ -716,7 +734,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		esac
 		;;
 	12)
-		CHOICES=$(dialog --title "Custom Command" --nocancel --stdout --menu "Choose an option below of what frontend you want to submit your command to." 0 0 0 \
+		CHOICES=$(dialog --title "Custom Command" --stdout --nocancel --menu "Choose an option below of what frontend you want to submit your command to." 0 0 0 \
 			"apt" "Standard apt utility (not recommended)" \
 			"apt-get" "Apt utility meant for scripts (recommended)" \
 			"apt-cache" "Searching and getting info about packages" \
@@ -725,10 +743,14 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 			"ping" "Internet connection tester" \
 			"bash" "Standard terminal shell" \
 			"sh" "Standard terminal shell" \
+			"gh" "Github Tools" \
+			"git" "Github Tools" \
 			"" "Other terminal shell" \
-			"b" "Go back to the main menu")
+			"back" "Go back to the main menu")
+		#echo "Break"
+		#exit
 		case "$CHOICES" in
-			"b")
+			"back")
 				./easyAPTmenu.sh
 				;;
 			*)
@@ -755,131 +777,90 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		./easyAPTmenu.sh
 		;;
 	14)
-		dialog --title "Updating" --infobox --stdout "Updating the tool. Make sure that git is installed and running properly." 0 0
-		touch OUTPUT.txt
-		echo "-----> GIT existence check" >> OUTPUT.txt
-		git >> OUTPUT.txt
+		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		clear
+		#su -
 		case "$?" in
-			127)
-				dialog --title "GIT error" --msgbox --stdout "GIT wasn't found. Try going to the Main Menu > Install a package > Install with specific name and then type GIT and hit enter." 0 0
-				./easyAPTmenu.sh
-				exit 0
+			0)
 				;;
 			*)
+				dialog --title "Error" --msgbox --stdout "The easyAPT github setup failed. This requires Github services to work." 0 0
+				./easyAPTmenu.sh
+				exit
 				;;
 		esac
-		sleep 2
-		dialog --title "" --nocancel --msgbox --stdout "On the next screen, you'll see a directory picker. Select the directory where the easyAPT repo was cloned. If you moved it to a new location, then select that location instead. Make sure to SELECT THE EASYAPT FOLDER, not its parent directory. For example, if easyAPT was in your home directory, you'd choose '~/easyAPT', not '~'." 0 0
-		SCRIPTPATH=$(dialog --title "Select the directory below." --dselect --stdout / 0 0)
+		sudo -u "$SUDO_USER" beep >/dev/null 2>&1
+		case "$?" in
+			0)
+				;;
+			*)
+				clear
+				echo "Looks like we couldn't make a beep sound. Pretend there is one."
+				read -p "Push enter to continue."
+				;;
+		esac
+		dialog --title "Warning!" --yesno --stdout "This is a beta feature that may be unstable and may delete the wrong files. You may want to back up your files before continuing. Or, don't continue at all - you're doing this at your own risk. Make sure to report any bugs with the easyAPT issue reporter. Do you want to continue?" 0 0
 		case "$?" in
 			0)
 				;;
 			*)
 				./easyAPTmenu.sh
-				exit 0
+				exit
 				;;
 		esac
-		dialog --title "Updating" --infobox --stdout "Updating the tool. Give us a moment..." 0 0 
+		#./easyAPTmenu.sh
+		#exit
+		dialog --title "Update" --stdout --yesno "Would you like to install the latest version of easyAPT?" 0 0
+		case "$?" in
+			0)
+				;;
+			*)
+				./easyAPTmenu.sh
+				exit
+				;;
+		esac
+		EASYAPTDIR=$(dialog --title "Choose easyAPT directory" --stdout --dselect $PWD/easyAPT 0 0)
+		dialog --title "Update" --infobox "We are now updating easyAPT, please wait."0 0 0
 		cd /
-		cd $SCRIPTPATH
-		sleep 2
-		which .version3 >/dev/null 2>&1
+		cd "$EASYAPTDIR"
+		#mkdir easyAPT
+		#cd easyAPT
+		#clear
+		sudo -u $SUDO_USER gh release download --repo pointer-laptop13244/easyAPT --pattern $EASYAPTFILENAME >/dev/null 2>&1 
+		#echo "Break"
+		#exit
 		case "$?" in
 			0)
-				rm .version3
 				;;
 			*)
-				;;
-		esac	
-		#rm .version3
-		touch .version3
-		mv .version2 .version3
-		sleep 1
-		echo "-----> curl (get the current version number in the repo) command output" >> OUTPUT.txt
-		curl -L -o .version2 "https://raw.githubusercontent.com/pointer-laptop13244/easyAPT/refs/heads/main/.version2" >> OUTPUT.txt
-		case "$?" in
-			0)
-				sleep 1
-				CURRENTVER=$(cat .version)
-				UPDATEVER=$(cat .version2)
-				if (( CURRENTVER == UPDATEVER )); then
-					dialog --title "No updates avalible" --msgbox --stdout "Seems like the version you have matches the one in the repo. You're up to date!" 0 0
-					rm .version2
-					mv .version3 .version2
-					./easyAPTmenu.sh
-					exit 0
-				else
-					dialog --title "Update Message" --yesno --stdout "Your install doesn't match the one in the repo. If you're not on the stable version of easyAPT, check that the Github release number on the splash screen matches your version, and if not, reclone the repo. If you are NOT, however, you can automatically update to the latest stable version. Would you like to update now?" 0 0
-					case "$?" in
-						0)
-							;;
-						*)
-							./easyAPTmenu.sh
-							exit 0
-							;;
-					esac
-					dialog --title "" --infobox --stdout "Updating the tool. Give us a moment..." 0 0
-					sleep 2
-					cd /
-					cd $SCRIPTPATH
-					case "$?" in
-						0)
-							;;
-						*)
-							dialog --title "Error (code $?)" --msgbox --stdout "We ran into a issue changing to the easyAPT directory you specified. Check that it exists and that you have the right permissions. This check is in effect to prevent us from deleting the wrong thing."
-							./easyAPTmenu.sh
-							exit 0
-							;;
-					esac
-					rm * >/dev/null 2>&1
-					sleep 2 
-					cd ..
-					sleep 2
-					dialog --title "" --infobox --stdout "Updating the tool, give us a moment. Don't terminate or interrupt this script: things might break!" 0 0
-					echo "------> Repo Cloning" >> OUTPUT.txt
-					gh repo clone pointer-laptop13244/easyAPT >> OUTPUT.txt
-					exitStatus=$?
-					sleep 2
-					case "$exitStatus" in
-						0)
-							;;
-						*)
-							#dialog --title "Fatal Error (code $?)" --msgbox --stdout "We ran into an issue updating the tool, and now your install may be broken. The simplest way to fix this is to delete all leftover files and reclone the repo manually back to your device - check the Github README.md page for more info. The script will now terminate" 0 0
-							#clear
-							#exit 8
-							clear
-							echo "easyAPT PANIC"
-							echo "Code 8"
-							echo "---"
-							#echo "APT/dpkg is missing from your Linux distro."
-							#echo "This may be because your system is not Debian/Ubuntu, or it got deleted."
-							#echo "If it got deleted (and your system is Debian, Ubuntu, or another with the package manager, go to the offical help forums or do research to get the next steps."
-							echo "Something went wrong while updating."
-							echo "easyAPT may now be corrupted. We terminated the whole program to keep things stable."
-							echo "Go to the main GitHub README.md for what to do next."
-							echo "---"
-							read -n 1 -p "easyAPT cannot continue. Press any key to exit."
-							clear
-							exit 8
-							;;
-					esac
-					rm .version3
-					dialog --title "Update" --msgbox --stdout "The update seems like it was a success, but you need to restart the script to apply it. When ready, click OK, navigate to your easyAPT directory, and type 'sudo ./easyAPT.sh' to launch the script." 0 0
-					clear
-					exit 0	
-				fi
-				;;
-			*)
-				rm .version2
-				touch .version2
-				mv .version3 .version2
-				dialog --title "Operation Failure" --msgbox --stdout "Something went wrong while we tried to check for updates. Go to the Main Menu > See last command output to see what went wrong. All modified easyAPT files have been returned to their original state." 0 0
+				cd ..
+				rm -rf easyAPT
+				#echo "Break"
+				#echo "Current directory: $PWD"
+				#exit
+				dialog --title "Error code $?" --msgbox --stdout "Failed to update easyAPT. Your existing installation is still safe." 0 0
 				./easyAPTmenu.sh
-				exit 0
+				exit
 				;;
-		
 		esac
-		;;
+		cd $EASYAPTDIR
+		unzip $EASYAPTFILE -d $EASYAPTDIR/easyAPT >/dev/null 2>&1
+		chmod +x *.sh
+		#touch ../output.txt
+		#dir >> ../output.txt
+		cd ..
+		mv easyAPT.sh easyAPT
+		rm *.sh
+		rm *.txt
+		mv easyAPT easyAPT.sh
+		clear
+		echo "Installation seems to be finished. Go into the new easyAPT folder and run easyAPT."
+		echo "Finishing up"
+		rm easyAPT.sh
+		rm .*
+		echo "Done."
+		exit
+		;;	
 	15)
 		dialog --title "Exit" --yesno --stdout "Are you sure you want to leave easyAPT? You can relaunch it anytime by typing sudo ./easyAPT.sh." 0 0
 		case "$?" in
@@ -906,10 +887,11 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		echo "If '$ABOUT' and '$ABOUT2' are not the same, run the easyAPT updater." >> about.txt
 		echo " " >> about.txt
 		echo "easyAPT - Making package installation easier" >> about.txt
-		echo "Version JUL13-V52 (July 8 Version 52), Github release N/A (not yet!)" >> about.txt
-		echo "Beta Edition - from Github" >> about.txt
+		echo "Version JUL18-V102 (July 18 Version 102), Github release 1.0.2" >> about.txt
+		#echo "Beta Edition - from Github" >> about.txt
+		echo "Stable Edition - from Github" >> about.txt
 		echo " " >> about.txt
-		echo "Licensing information: none yet (Since this is going to be public, soon.)" >> about.txt
+		#echo "Licensing information: none yet (Since this is going to be public, soon.)" >> about.txt
 		echo " " >> about.txt
 		echo "Made with care by p14277376. Hope you enjoy!" >> about.txt
 		echo "You can see my other projects by going to my Github page." >> about.txt
@@ -931,18 +913,24 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		clear
 		echo "Please wait..."
 		sleep 3
-		gh issue create -R pointer-laptop13244/easyAPT
+		sudo -u "$SUDO_USER" gh issue create -R pointer-laptop13244/easyAPT
+		sleep 3
+		echo "---"
 		case "$?" in
 			0)
-				./easyAPTmenu.sh
-				exit
+				echo "Finished successfully with code $?. Just give it a few days, make sure you're subscribed to the Github project, and remember to check your email that your Github account is linked to; replies to the issue get sent there."
 				;;
 			*)
-				dialog --title "Error $?" --msgbox --stdout "An unknown error occured." 0 0
-				./easyAPTmenu.sh
-				exit
+				#dialog --title "Error $?" --msgbox --stdout "An unknown error occured." 0 0
+				#./easyAPTmenu.sh
+				#exit
+				echo "An error -- code $? -- occured and the issue may not have been sent. Try going to the issues page in your web browser."
 				;;
 		esac
+	        echo ""
+		read -p "Push enter to go to the easyAPT menu. Push CTRL+C to go to a command prompt."
+		./easyAPTmenu.sh
+		exit	
 		;;
 	18)
 		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
@@ -955,6 +943,16 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 			0)
 				clear
 				gh auth logout
+				sleep 2
+				case "$?" in
+					0)
+						echo "Success, code $?"
+						;;
+					*)
+						echo "Failure, code $?"
+						;;
+				esac
+				read -p "Push Enter to continue, CTRL+C to quit to the command prompt"
 				./easyAPTmenu.sh
 				exit
 				;;
@@ -965,5 +963,19 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 				;;
 
 		esac
+		;;
+	20)
+		clear
+		echo "This is the Github login status. If you're not logged in, some features are limited. You can log in using the Github Setup tool in the main menu."
+		echo "---"
+		sleep 3
+		sudo -u "$SUDO_USER" gh auth status
+		exitstat=$?
+		sleep 1
+		echo "---"
+		echo "Finished, exit code $exitstat"
+		read -p "Push enter to go back to easyAPT, CTRL+C to go to the command prompt."
+		./easyAPTmenu.sh
+		exit
+		;;
 esac
-#Clean up scripts go here...
