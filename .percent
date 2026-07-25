@@ -1,0 +1,6 @@
+#!/bin/bash
+PERCENT=$(cat /tmp/percent.txt)
+#echo $PERCENT
+#sleep 5
+dialog --title "Welcome to easyAPT!" --stdout --gauge "This is version JUL25-V110 (July 18 Version 110), Github release 1.0.2.  We are now starting up, this takes only a few seconds." 9 0 $PERCENT &
+sleep .6
