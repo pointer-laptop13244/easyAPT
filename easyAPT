@@ -187,14 +187,14 @@ case "$?" in
 	*)
 		clear
 		echo "easyAPT PANIC"
-		echo "Code 00"
+		echo "Code 78"
 		echo "---"
 		echo "Your /dev/null file was not found. That is required for normal operation."
 		echo "Please repair it."
 		echo "---"
 		read -n 1 -p "easyAPT cannot continue. Press any key to exit."
 		clear
-		exit 1
+		exit 78
 		;;
 esac
 #echo "70" | .percent
@@ -781,7 +781,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		;;
 	14)
 		#dialog --title "" --msgbox "To update easyAPT, go to the Github releases page, 
-		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		sudo -u "$SUDO_USER" easyaptgithub
 		clear
 		#su -
 		case "$?" in
@@ -907,7 +907,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		exit 0
 		;;
 	17)
-		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		sudo -u "$SUDO_USER" easyaptgithub
 		case "$?" in
 			0)
 				;;
@@ -939,7 +939,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		exit	
 		;;
 	18)
-		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		sudo -u "$SUDO_USER" easyaptgithub
 		easyAPTmenu
 		exit
 		;;

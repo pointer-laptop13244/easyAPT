@@ -1,5 +1,5 @@
 #!/bin/bash
-dialog --title "" --infobox "Loading menu...." 0 0
+dialog --title "" --infobox "Loading the main menu...." 0 0
 sleep 3
 CHOICE=$(dialog --title "Main Menu" --nocancel --stdout --menu "Choose an option below. Use the UP and DOWN arrow keys to navigate the menu and use the space/enter key to select the option. " 0 0 0 \
 	"1" "Remove unrequired packages" \
@@ -557,7 +557,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		;;
 	14)
 		#dialog --title "" --msgbox "To update easyAPT, go to the Github releases page, 
-		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		sudo -u "$SUDO_USER" easyaptgithub
 		clear
 		#su -
 		case "$?" in
@@ -683,7 +683,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		exit 0
 		;;
 	17)
-		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		sudo -u "$SUDO_USER" easyaptgithub
 		case "$?" in
 			0)
 				;;
@@ -715,7 +715,7 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		exit	
 		;;
 	18)
-		sudo -u "$SUDO_USER" /$PWD/.easyaptgithub.sh
+		sudo -u "$SUDO_USER" easyaptgithub
 		easyAPTmenu
 		exit
 		;;
