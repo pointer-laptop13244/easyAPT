@@ -1,6 +1,6 @@
 #!/bin/bash
 #In the Github release, what is the main easyAPT ZIP file called? In the line below, change 'HERE' to the actual filename.
-EASYAPTFILENAME='easyapt.deb'
+#EASYAPTFILENAME='easyapt.deb'
 
 
 
@@ -793,17 +793,17 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 				exit
 				;;
 		esac
-		sudo -u "$SUDO_USER" beep >/dev/null 2>&1
-		case "$?" in
-			0)
-				;;
-			*)
-				clear
-				echo "Looks like we couldn't make a beep sound. Pretend there is one."
-				read -p "Push enter to continue."
-				;;
-		esac
-		dialog --title "Warning!" --yesno --stdout "This is a beta feature that may be unstable and may delete the wrong files. You may want to back up your files before continuing. Or, don't continue at all - you're doing this at your own risk. Make sure to report any bugs with the easyAPT issue reporter. Do you want to continue?" 0 0
+		#sudo -u "$SUDO_USER" beep >/dev/null 2>&1
+		#case "$?" in
+		#	0)
+		#		;;
+		#	*)
+				#clear
+				#echo "Looks like we couldn't make a beep sound. Pretend there is one."
+				#read -p "Push enter to continue."
+				#;;
+		#esac
+		#dialog --title "Warning!" --yesno --stdout "This is a beta feature that may be unstable and may delete the wrong files. You may want to back up your files before continuing. Or, don't continue at all - you're doing this at your own risk. Make sure to report any bugs with the easyAPT issue reporter. Do you want to continue?" 0 0
 		case "$?" in
 			0)
 				;;
@@ -823,30 +823,32 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 				exit
 				;;
 		esac
-		EASYAPTDIR=$(dialog --title "Choose easyAPT directory" --stdout --dselect $PWD/easyAPT 0 0)
+		#EASYAPTDIR=$(dialog --title "Choose easyAPT directory" --stdout --dselect $PWD/easyAPT 0 0)
 		#dialog --title "Update" --infobox "We are now updating easyAPT, please wait."0 0 0
 		#cd /
-		cd "$EASYAPTDIR"
+		#cd "$EASYAPTDIR"
 		#mkdir easyAPT
 		#cd easyAPT
 		#clear
-		sudo -u $SUDO_USER gh release download --repo pointer-laptop13244/easyAPT --pattern $EASYAPTFILENAME >/dev/null 2>&1 
+		clear
+		echo "Please wait..."
+		sudo -u $SUDO_USER gh release download --repo pointer-laptop13244/easyAPT --pattern easyaptsetup.sh >/dev/null 2>&1 
 		#echo "Break"
 		#exit
-		case "$?" in
-			0)
-				;;
-			*)
-				cd ..
-				rm -rf easyAPT
-				#echo "Break"
-				#echo "Current directory: $PWD"
-				#exit
-				dialog --title "Error code $?" --msgbox --stdout "Failed to update easyAPT. Your existing installation is still safe." 0 0
-				easyAPTmenu
-				exit
-				;;
-		esac
+		#case "$?" in
+		#	0)
+		#		;;
+		#	*)
+		#		cd ..
+		#		rm -rf easyAPT
+		#		#echo "Break"
+		#		#echo "Current directory: $PWD"
+		#		#exit
+		#		dialog --title "Error code $?" --msgbox --stdout "Failed to update easyAPT. Your existing installation is still safe." 0 0
+		#		easyAPTmenu
+		#		exit
+		#		;;
+		#esac
 		#cd $EASYAPTDIR
 		#unzip $EASYAPTFILE -d $EASYAPTDIR/easyAPT >/dev/null 2>&1
 		#chmod +x *.sh
@@ -857,14 +859,26 @@ CHOICE99=$(dialog --title "Package Purge" --inputbox --stdout "Type the package 
 		#rm *.sh
 		#rm *.txt
 		#mv easyAPT easyAPT.sh
-		apt-get reinstall $EASYAPTFILENAME -y >/dev/null
-		clear
+		#apt-get reinstall $EASYAPTFILENAME -y >/dev/null
+		#clear/
 		#echo "Installation seems to be finished. Go into the new easyAPT folder and run easyAPT."
-		echo "Finishing up"
+		#echo "Finishing up"
 		#rm easyAPT.sh
 		#rm .*
-		echo "Done."
-		echo "Restart easyAPT manually."
+		#echo "Done."
+		#echo "Restart easyAPT manually."
+		#
+		#echo "Please wait..."
+		chmod +x easyaptsetup.sh
+		./easyaptsetup.sh
+		case "$?" in
+			0)
+				;;
+			*)
+				echo "Error! Exit code $?."
+				exit $?
+				;;
+		esac
 		exit
 		;;	
 	15)
